@@ -1,0 +1,166 @@
+openapi: 3.0.0
+info:
+  title: MailServer
+  description: Backend that manages Mail accounts, so they can be accessed from Webpages, where socket connections aren't possible
+  version: 0.0.1
+servers:
+  - url: 'https'
+tags:
+  - name: user
+    description: User stuff
+  - name: mail
+    description: Mail stuff
+paths:
+  /mail-accounts:
+    get:
+      tags:
+        - mail
+      description: Returns all MailAccount objects of the requesting User
+      responses:
+        200:
+          description: List of all MailAccounts the user has registered, including it's mails
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MailAccount'
+  /mail-accounts/sync:
+    get:
+      tags:
+        - mail
+      description: Prompts the server to fetch the Mail state for all of the requesting users MailAccounts
+      responses:
+        200:
+          $ref: '#/components/responses/OK'
+
+  /mail-accounts/{id}:
+    get:
+      tags:
+        - mail
+      description: Returns MailAccount with the given id, if it is owned by the requesting user
+      responses:
+        200:
+          description: MailAccount
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailAccount'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /mail-accounts/{id}/sync:
+    get:
+      tags:
+        - mail
+      description: Prompts the server to fetch the Mail state for the MaillAccount with given ID.
+      responses:
+        200:
+          $ref: '#/components/responses/OK'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /mail-accounts/{id}/send:
+    post:
+      tags:
+        - mail
+      description: Tries to Send a Mail using the MailAcount with given id
+      responses:
+        200:
+          $ref: '#/components/responses/OK'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        500:
+          $ref: '#/components/responses/ServerError'
+
+
+
+
+components:
+  responses:
+    OK:
+      description: OK
+    BadRequest:
+      description: Bad Request
+    NotFound:
+      description: The specified resource was not found
+    Unauthorized:
+      description: Unauthorized
+    ServerError:
+      description: Internal Server Error
+
+  schemas:
+    MailAccount:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "john.doe"
+        password:
+          type: string
+          example: "super secret"
+        smtpHost:
+          type: string
+          example: "mail.example.com"
+        imapHost:
+          type: string
+          example: "imap.example.com"
+        folders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Folder"
+
+    Folder:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "INBOX"
+        mails:
+          type: array
+          items:
+            $ref: "#/components/schemas/Mail"
+
+    Mail:
+      type: object
+      properties:
+        uid:
+          type: number
+          example: 4568
+        from:
+          type: string
+          example: "Hannah Lappe <hannah@lappe.page>"
+        subject:
+          type: string
+          example: "To you 2000 years from now"
+        body:
+          type: string
+          example: "Titans going stomp"
+        recipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recipient'
+        unread:
+          type: boolean
+
+
+    Recipient:
+      type: object
+      properties:
+        address:
+          type: string
+          example: "Hannah Lappe <hannah@lappe.page>"
+        type:
+          $ref: '#/components/schemas/RecipientType'
+
+    RecipientType:
+      type: String
+      enum: [To, Cc, Bcc]
