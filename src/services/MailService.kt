@@ -173,7 +173,7 @@ class MailService @Inject constructor(
 
         val session = Session.getInstance(props, object : Authenticator() {
             override fun getPasswordAuthentication(): PasswordAuthentication {
-                return PasswordAuthentication("florian.lappe", "eh87q2f5lw")
+                return PasswordAuthentication("*****", "******")
             }
         })
 
@@ -181,8 +181,8 @@ class MailService @Inject constructor(
         kotlin.runCatching {
             MimeMessage(session)
                 .apply {
-                    setFrom(InternetAddress("florian.lappe@web.de"))
-                    addRecipient(Message.RecipientType.TO, InternetAddress("florian.lappe@gmail.com"))
+                    setFrom(InternetAddress("example@example.com"))
+                    addRecipient(Message.RecipientType.TO, InternetAddress("example@example.com"))
                     subject = "test"
                     setText("alot of test")
                 }

@@ -12,7 +12,7 @@ import kotlin.concurrent.thread
 
 
 @Singleton
-class DBManager {
+class 2DBManager {
     private lateinit var dbConnection: Database
 
     init {
